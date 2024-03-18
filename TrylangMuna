@@ -1,0 +1,39 @@
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
+import graphviz
+import pandas as pd
+
+# Define your dataset
+data = {
+    'Age': [35, 45, 28, 50],
+    'Gender': ['Male', 'Female', 'Male', 'Female'],
+    'Monthly Income': [4000, 6000, 3000, 8000],
+    'Subscription Plan': ['Basic', 'Standard', 'Basic', 'Premium'],
+    'Duration of Subscription': [12, 24, 6, 18],
+    'Data Usage': [2.5, 3.2, 1.8, 4.5],
+    'Minutes Used': [300, 400, 200, 500],
+    'SMS Sent': [50, 70, 30, 100],
+    'Churn': ['NO', 'YES', 'NO', 'NO']
+}
+
+df = pd.DataFrame(data)
+
+# Convert categorical variables to numerical using one-hot encoding
+df_encoded = pd.get_dummies(df.drop('Churn', axis=1))
+
+# Define features and target variable
+X = df_encoded.values
+y = df['Churn'].values
+
+# Initialize and train the decision tree classifier
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+
+# Visualize the decision tree
+dot_data = export_graphviz(clf, out_file=None, 
+                           feature_names=list(df_encoded.columns),
+                           class_names=['Churn: NO', 'Churn: YES'],
+                           filled=True, rounded=True, special_characters=True)
+
+graph = graphviz.Source(dot_data)
+graph.render('subscription_decision_tree')  # Save the graph as 'subscription_decision_tree.pdf'
+graph.view()  # Display the graph
